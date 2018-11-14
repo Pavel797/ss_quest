@@ -101,10 +101,12 @@ def get_hints(request):
             hint.read_teams.add(team)
             hint.save()
 
-    data = [{
-        'id': hint.id,
-        'hint': hint.hint
-    } for hint in hints]
+    data = []
+    if result:
+        data = [{
+            'id': hint.id,
+            'hint': hint.hint
+        } for hint in hints]
 
     return JsonResponse({
         'success': result,
