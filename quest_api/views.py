@@ -13,14 +13,15 @@ def get_markers(request):
     if not uid_team or not team:
         message = 'team not found'
 
-    makers = Marker.objects.filter(Q(team__uid=uid_team) | Q(isPublic=True)) \
+    makers = Marker.objects.filter(Q(team__uid=uid_team) | Q(is_public=True)) \
         .filter(team_taken=None).all()
 
     data = [{
         'id': maker.id,
         'longitude': maker.longitude,
         'latitude': maker.latitude,
-        'isPublic': maker.isPublic
+        'url':'https://img-fotki.yandex.ru/get/195853/200418627.1a7/0_18d5d6_9a3b2bed_orig.png',
+        'is_public': maker.is_public
     } for maker in makers]
 
     return JsonResponse({
@@ -50,9 +51,9 @@ def take_marker(request):
     marker = None
     if result:
         marker = Marker.objects.filter(key=key_marker) \
-            .filter(Q(team__uid=team.uid) | Q(isPublic=True)).first()
+            .filter(Q(team__uid=team.uid) | Q(is_public=True)).first()
 
-    if marker.team_taken:
+    if result and marker and marker.team_taken:
         message = 'marker already taken'
         result = 0
 

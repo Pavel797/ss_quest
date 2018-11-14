@@ -1,0 +1,42 @@
+version: '2'
+
+services:
+
+  nginx:
+    image: nginx:latest
+    ports:
+    - '80:80'
+    volumes:
+    - ./nginx/conf.d:/etc/nginx/conf.d
+    - ./static:/ss_quest_staging/static
+    links:
+    - web:web
+    depends_on:
+    - web
+
+  web:
+    build: ./
+    # command: python /nekidaem/manage.py migrate && gunicorn --chdir /nekidaem/nekidaem_proj/ nekidaem_proj.wsgi:application --bind 0.0.0.0:8000
+    command: >
+      bash -c "python /ss_quest_staging/manage.py migrate
+      && gunicorn --chdir /ss_quest_staging ss_quest.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+    - ./:/ss_quest_staging
+    environment:
+      DJANGO_SETTINGS_MODULE: ss_quest.settings_staging
+#    links:
+#    - postgres:postgres
+#    depends_on:
+#    - postgres
+
+
+#  postgres:
+#    image: postgres:9.4
+#    volumes:
+#    - ./dockerdatastaging/psql-data:/var/lib/postgresql/data
+#    environment:
+#      POSTGRES_USER: 'db_username'
+#      POSTGRES_PASSWORD: 'db_password'
+#      POSTGRES_DB: 'db_db'
+#    ports:
+#    - '5432:5432'
