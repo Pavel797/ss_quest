@@ -21,6 +21,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('quest_api/', include('quest_api.url', namespace='quest_api')),
+    path('', include('status.url', namespace='status')),
 ]
 
 if settings.DEBUG:

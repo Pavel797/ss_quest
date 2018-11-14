@@ -6,26 +6,31 @@ from .models import *
 
 def get_markers(request):
     message = 'markers received'
+    result = 1
 
     uid_team = request.GET.get('uid_team')
     team = Team.objects.filter(uid=uid_team).first()
 
     if not uid_team or not team:
         message = 'team not found'
+        result = 0
 
-    makers = Marker.objects.filter(Q(team__uid=uid_team) | Q(is_public=True)) \
-        .filter(team_taken=None).all()
+    data = []
+    if result:
+        makers = Marker.objects.filter(Q(team__uid=uid_team) | Q(is_public=True)) \
+                     .filter(team_taken=None).order_by('-priority')[:3]
 
-    data = [{
-        'id': maker.id,
-        'longitude': maker.longitude,
-        'latitude': maker.latitude,
-        'url':'https://img-fotki.yandex.ru/get/195853/200418627.1a7/0_18d5d6_9a3b2bed_orig.png',
-        'is_public': maker.is_public
-    } for maker in makers]
+        data = [{
+            'id': maker.id,
+            'name': maker.name,
+            'longitude': maker.longitude,
+            'latitude': maker.latitude,
+            'url': maker.url_image,
+            'is_public': maker.is_public
+        } for maker in makers]
 
     return JsonResponse({
-        'success': 1,
+        'success': result,
         'message': message,
         'data': data
     })
@@ -64,6 +69,8 @@ def take_marker(request):
     elif result:
         message = 'marker not found'
         result = 0
+        team.count_fail_marker_key += 1
+        team.save()
 
     return JsonResponse({
         'success': 1,
@@ -77,14 +84,22 @@ def take_marker(request):
 
 def get_hints(request):
     message = 'hints received'
+    result = 1
 
     uid_team = request.GET.get('uid_team')
     team = Team.objects.filter(uid=uid_team).first()
 
     if not uid_team or not team:
         message = 'team not found'
+        result = 0
 
-    hints = Hint.objects.filter(read_teams__uid__exact=team.uid).exclude()
+    hints = None
+    if result:
+        hints = Hint.objects.filter(target_teams__exact=team).exclude(read_teams__exact=team)
+    if hints and result:
+        for hint in hints:
+            hint.read_teams.add(team)
+            hint.save()
 
     data = [{
         'id': hint.id,
@@ -92,7 +107,7 @@ def get_hints(request):
     } for hint in hints]
 
     return JsonResponse({
-        'success': 1,
+        'success': result,
         'message': message,
         'data': data
     })

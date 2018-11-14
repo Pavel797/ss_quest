@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'quest_api',
+    'status',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
