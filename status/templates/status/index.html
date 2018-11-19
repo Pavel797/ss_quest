@@ -6,28 +6,44 @@
     <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
 
     <script type="text/javascript">
-        ymaps.ready(function () {
-            var myMap = new ymaps.Map("map", {
-                center: {{ centerMap }},
-                zoom: 17,
-                controls: []
+        document.addEventListener('DOMContentLoaded', function () {
+            ymaps.ready(function () {
+                var myMap = new ymaps.Map("map", {
+                    center: {{ centerMap }},
+                    zoom: 17,
+                    controls: []
+                });
+
+
+                {% for team in teams %}
+                    myMap.geoObjects.add(new ymaps.Placemark([{{ team.latitude }}, {{ team.longitude }}], {
+                        hintContent: '{{ marker.name }}', // Содержимое всплывающей подсказки
+                        balloonContent: 'Взята командой: {{  marker.team_taken.name }}'
+                        // Содержимое балуна
+                    }, {
+                        iconLayout: 'default#image',
+                        iconImageHref: '{{ team.url_image }}',
+                        iconImageSize: [50, 62],
+                        iconImageOffset: [-5, -38]
+                    }));
+
+                {% endfor %}
+
+
+                {% for marker in markers  %}
+                    myMap.geoObjects.add(new ymaps.Placemark([{{ marker.latitude }}, {{ marker.longitude }}], {
+                        hintContent: '{{ marker.name }}', // Содержимое всплывающей подсказки
+                        balloonContent: 'Взята командой: {{  marker.team_taken.name }}'
+                        // Содержимое балуна
+                    }, {
+                        iconLayout: 'default#image',
+                        iconImageHref: '{{ marker.url_image }}',
+                        iconImageSize: [50, 62],
+                        iconImageOffset: [-5, -38]
+                    }));
+                {% endfor %}
+
             });
-
-
-            {% for marker in markers  %}
-                myMap.geoObjects.add(new ymaps.Placemark([{{ marker.latitude }}, {{ marker.longitude }}], {
-                    hintContent: '{{ marker.name }}', // Содержимое всплывающей подсказки
-                    balloonContent: 'Взята командой: {{  marker.team_taken.name }}'
-                    // Содержимое балуна
-                }, {
-                    iconLayout: 'default#image',
-                    iconImageHref: '{{ marker.url_image }}',
-                    iconImageSize: [50, 62],
-                    iconImageOffset: [-5, -38]
-                }));
-            {% endfor %}
-
-
         });
     </script>
 

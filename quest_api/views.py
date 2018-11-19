@@ -113,3 +113,33 @@ def get_hints(request):
         'message': message,
         'data': data
     })
+
+
+def set_my_position(request):
+    message = 'position is set'
+    result = 1
+
+    uid_team = request.GET.get('uid_team')
+    team = Team.objects.filter(uid=uid_team).first()
+
+    if not uid_team or not team:
+        message = 'team not found'
+        result = 0
+
+    latitude = request.GET.get('latitude')
+    longitude = request.GET.get('longitude')
+
+    if not latitude or not longitude or \
+            not latitude.isdigit() or not longitude.isdigit():
+        message = 'no data available'
+        result = 0
+
+    if result:
+        team.latitude = float(latitude)
+        team.longitude = float(longitude)
+        team.save()
+
+    return JsonResponse({
+        'success': result,
+        'message': message
+    })
