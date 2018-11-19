@@ -114,6 +114,12 @@ def get_hints(request):
         'data': data
     })
 
+def isfloat(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
 
 def set_my_position(request):
     message = 'position is set'
@@ -130,7 +136,7 @@ def set_my_position(request):
     longitude = request.GET.get('longitude')
 
     if not latitude or not longitude or \
-            not latitude.isdigit() or not longitude.isdigit():
+            not isfloat(latitude) or not isfloat(longitude):
         message = 'no data available'
         result = 0
 
