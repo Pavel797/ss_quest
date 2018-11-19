@@ -4,6 +4,14 @@ from django.http import JsonResponse
 from .models import *
 
 
+"""
+
+docker stop $(docker ps -aq)
+docker rm $(docker ps -aq)
+docker-compose -f docker-compose.staging.yml up -d
+
+"""
+
 def get_markers(request):
     message = 'markers received'
     result = 1

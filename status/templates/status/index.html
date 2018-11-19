@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function () {
             ymaps.ready(function () {
-                var myMap = new ymaps.Map("map", {
+                myMap = new ymaps.Map("map", {
                     center: {{ centerMap }},
                     zoom: 17,
                     controls: []
@@ -17,8 +19,7 @@
 
                 {% for team in teams %}
                     myMap.geoObjects.add(new ymaps.Placemark([{{ team.latitude }}, {{ team.longitude }}], {
-                        hintContent: '{{ marker.name }}', // Содержимое всплывающей подсказки
-                        balloonContent: 'Взята командой: {{  marker.team_taken.name }}'
+                        hintContent: '{{ team.name }}',
                         // Содержимое балуна
                     }, {
                         iconLayout: 'default#image',
@@ -44,31 +45,86 @@
                 {% endfor %}
 
             });
+
+            function updateData() {
+                $.ajax('get_status_json/', {
+                    success: function (data) {
+                        $('#status').text("Идёт соревнование!");
+
+                        console.log(myMap.geoObjects.get(0).properties.);
+
+                        myMap.geoObjects.removeAll();
+
+
+                        data.markers.forEach(function (marker, i, arr) {
+                            myMap.geoObjects.add(new ymaps.Placemark([marker.latitude, marker.longitude], {
+                                my_id:marker.id,
+                                hintContent: marker.name, // Содержимое всплывающей подсказки
+                                balloonContent: 'Взята командой: ' + marker.team_id
+                                // Содержимое балуна
+                            }, {
+                                iconLayout: 'default#image',
+                                iconImageHref: marker.url_image,
+                                iconImageSize: [50, 62],
+                                iconImageOffset: [-5, -38]
+                            }));
+                        });
+                        data.teams.forEach(function (team, i, arr) {
+                            myMap.geoObjects.add(new ymaps.Placemark([team.latitude, team.longitude], {
+                                my_id:team.id,
+                                hintContent: team.name,
+                                // Содержимое балуна
+                            }, {
+                                iconLayout: 'default#image',
+                                iconImageHref: team.url_image,
+                                iconImageSize: [50, 62],
+                                iconImageOffset: [-5, -38]
+                            }));
+                        });
+
+
+                        console.log(data);
+                    },
+
+                    error: function () {
+                        $('#status').text("Error!!!");
+                    }
+                });
+            }
+
+            setInterval(function () {
+                updateData()
+            }, 1500);
+
         });
+
     </script>
 
     <title>Статус соревнования</title>
 </head>
 
 <body>
+<div id="container">
+    <h1 id="status">Загрузка данных...</h1>
 
-<div id="map" style="width: 100%; height: 700px"></div>
+    <div id="map" style="width: 100%; height: 700px"></div>
 
-<table border="1" width="100%" cellpadding="5">
-    <tr>
-        <th>Название команды</th>
-        <th>Кол-во собранных меток</th>
-        <th>Кол-во штрафных очков</th>
-    </tr>
-
-    {% for team in teams %}
+    <table border="1" width="100%" cellpadding="5">
         <tr>
-            <td>{{ team.name }}</td>
-            <td>{{ team.taken_markers.count }}</td>
-            <td>{{ team.count_fail_marker_key }}</td>
+            <th>Название команды</th>
+            <th>Кол-во собранных меток</th>
+            <th>Кол-во штрафных очков</th>
         </tr>
-    {% endfor %}
-</table>
 
+        {% for team in teams %}
+            <tr>
+                <td>{{ team.name }}</td>
+                <td>{{ team.taken_markers.count }}</td>
+                <td>{{ team.count_fail_marker_key }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+</div>
 </body>
 </html>
