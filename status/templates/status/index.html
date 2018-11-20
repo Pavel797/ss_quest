@@ -56,7 +56,7 @@
 
                         data.markers.forEach(function (marker, i, arr) {
                             myMap.geoObjects.add(new ymaps.Placemark([marker.latitude, marker.longitude], {
-                                my_id:marker.id,
+                                my_id: marker.id,
                                 hintContent: marker.name, // Содержимое всплывающей подсказки
                                 balloonContent: 'Взята командой: ' + marker.team_id
                                 // Содержимое балуна
@@ -67,9 +67,48 @@
                                 iconImageOffset: [-5, -38]
                             }));
                         });
+
+                        var turnirTable = document.getElementById('turnerTable');
+                        while (turnirTable.rows.length !== 0) {
+                            turnirTable.deleteRow(0);
+                        }
+
+
+                        tr = document.createElement('tr');
+
+                        th = document.createElement('th');
+                        th.innerHTML = "Название команды";
+                        tr.appendChild(th);
+
+                        th = document.createElement('th');
+                        th.innerHTML = "Кол-во собранных меток";
+                        tr.appendChild(th);
+
+                        th = document.createElement('th');
+                        th.innerHTML = "Кол-во штрафных очков";
+                        tr.appendChild(th);
+
+                        th = document.createElement('th');
+                        th.innerHTML = "Жизни";
+                        tr.appendChild(th);
+
+                        turnirTable.appendChild(tr);
+
+
                         data.teams.forEach(function (team, i, arr) {
+                            var newRow = turnirTable.insertRow(i + 1);
+                            var nameTeam = newRow.insertCell(0);
+                            var countMarker = newRow.insertCell(1);
+                            var countFail = newRow.insertCell(2);
+                            var standardOfLiving = newRow.insertCell(3);
+
+                            nameTeam.innerHTML = team.name;
+                            countMarker.innerHTML = team.taken_markers_count;
+                            countFail.innerHTML = team.count_fail_marker_key;
+                            standardOfLiving.innerHTML = team.standard_of_living;
+
                             myMap.geoObjects.add(new ymaps.Placemark([team.latitude, team.longitude], {
-                                my_id:team.id,
+                                my_id: team.id,
                                 hintContent: team.name,
                                 // Содержимое балуна
                             }, {
@@ -107,11 +146,12 @@
 
     <div id="map" style="width: 100%; height: 700px"></div>
 
-    <table border="1" width="100%" cellpadding="5">
+    <table border="1" width="100%" cellpadding="5" id="turnerTable">
         <tr>
             <th>Название команды</th>
             <th>Кол-во собранных меток</th>
             <th>Кол-во штрафных очков</th>
+            <th>Жизни</th>
         </tr>
 
         {% for team in teams %}
@@ -119,6 +159,7 @@
                 <td>{{ team.name }}</td>
                 <td>{{ team.taken_markers.count }}</td>
                 <td>{{ team.count_fail_marker_key }}</td>
+                <td>{{ team.standard_of_living }}</td>
             </tr>
         {% endfor %}
     </table>

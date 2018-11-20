@@ -15,8 +15,17 @@ def index(request):
 
 def get_status_json(request):
     markers = Marker.objects.all().values()
-    teams = Team.objects.all().values()
+    teams = Team.objects.all()
+
     return JsonResponse({
         'markers': list(markers),
-        'teams': list(teams)
+        'teams': [{
+            'name': team.name,
+            'latitude': team.latitude,
+            'url_image': team.url_image,
+            'longitude': team.longitude,
+            'taken_markers_count': team.taken_markers.count(),
+            'count_fail_marker_key': team.count_fail_marker_key,
+            'standard_of_living': team.standard_of_living
+        } for team in teams]
     })

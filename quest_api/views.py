@@ -3,7 +3,6 @@ from django.db.models import Q
 from django.http import JsonResponse
 from .models import *
 
-
 """
 
 docker stop $(docker ps -aq)
@@ -11,6 +10,7 @@ docker rm $(docker ps -aq)
 docker-compose -f docker-compose.staging.yml up -d
 
 """
+
 
 def get_markers(request):
     message = 'markers received'
@@ -33,6 +33,9 @@ def get_markers(request):
             'name': maker.name,
             'longitude': maker.longitude,
             'latitude': maker.latitude,
+            'type': maker.type.name,
+            'casualty_radius': maker.casualty_radius
+                        if maker.type.name == 'zombie' or maker.type.name == 'respawn' else None,
             'url': maker.url_image,
             'is_public': maker.is_public
         } for maker in makers]
@@ -81,7 +84,7 @@ def take_marker(request):
         team.save()
 
     return JsonResponse({
-        'success': 1,
+        'success': result,
         'message': message,
         'data': {
             'result': result
@@ -122,12 +125,14 @@ def get_hints(request):
         'data': data
     })
 
+
 def isfloat(value):
     try:
         float(value)
         return True
     except ValueError:
         return False
+
 
 def set_my_position(request):
     message = 'position is set'
