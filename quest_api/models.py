@@ -9,6 +9,10 @@ class Team(models.Model):
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     url_image = models.CharField(max_length=1024)
     standard_of_living = models.IntegerField(default=3)
+    count_take_respawn = models.IntegerField(default=0)
+    count_jacket = models.IntegerField(default=0)
+    count_flamethrower = models.IntegerField(default=0)
+    time_contact_marker = models.DateTimeField(default=0)
 
     def __str__(self):
         return self.name
@@ -35,7 +39,7 @@ class Marker(models.Model):
     team_taken = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='taken_markers', blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return '{} - {}'.format(self.name, self.type)
 
 
 class Hint(models.Model):
