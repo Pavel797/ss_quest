@@ -107,6 +107,7 @@ def take_marker(request):
             team.count_jacket += 1
 
         marker.save()
+        team.save()
         result = 1
     else:
         team.standard_of_living -= 1
