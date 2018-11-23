@@ -169,7 +169,10 @@ def set_my_position(request):
     markers = Marker.objects.all()
 
     for marker in markers:
-        distance =  haversine(team.latitude, team.longitude, marker.latitude, marker.longitude)
+        if marker.team_taken:
+            continue
+
+        distance = haversine(team.latitude, team.longitude, marker.latitude, marker.longitude)
         if marker.type.name == 'respawn' and distance <= marker.casualty_radius:
             team.standard_of_living = 3
             team.count_take_respawn += 1
