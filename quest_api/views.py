@@ -44,6 +44,19 @@ def create_base_json_response(result_code, message, data=None):
     })
 
 
+def drop_markers(request):
+    markers = Marker.objects.all()
+
+    for marker in markers:
+        marker.team_taken = None
+        marker.save()
+
+    return JsonResponse({
+        'success': 1,
+        'message': "drop markers"
+    })
+
+
 def get_markers(request):
     uid_team = request.GET.get('uid_team')
     team = Team.objects.filter(uid=uid_team).first()
@@ -51,23 +64,74 @@ def get_markers(request):
     if not uid_team or not team:
         return create_base_json_response(0, 'team not found')
 
-    if team.standard_of_living > 0:
-        makers = Marker.objects.filter(Q(team__uid=uid_team) | Q(is_public=True)) \
-                     .filter(team_taken=None).order_by('-priority')[:3]
-    else:
-        makers = Marker.objects.filter(type__name='respawn')
+    respawns = Marker.objects.filter(type__name='respawn')
+    zombies = []
+    flamethrowers = []
+    jackets = []
 
-    data = [{
-        'id': maker.id,
-        'name': maker.name,
-        'longitude': maker.longitude,
-        'latitude': maker.latitude,
-        'type': maker.type.name,
-        'casualty_radius': maker.casualty_radius
-        if maker.type.name == 'zombie' or maker.type.name == 'respawn' else None,
-        'url': maker.url_image,
-        'is_public': maker.is_public
-    } for maker in makers]
+    if team.standard_of_living > 0:
+        zombies = Marker.objects.filter(team_taken=None, type__name='zombie') \
+                      .order_by('-priority')[:10]
+
+        flamethrowers = Marker.objects.filter(Q(team=team, team_taken=None, type__name='flamethrower')) \
+                            .order_by('-priority')[:3]
+
+        jackets = Marker.objects.filter(Q(team=team, team_taken=None, type__name='jacket')) \
+                      .order_by('-priority')[:3]
+
+    data = []
+
+    for marker in respawns:
+        data.append({
+            'id': marker.id,
+            'name': marker.name,
+            'longitude': marker.longitude,
+            'latitude': marker.latitude,
+            'type': marker.type.name,
+            'casualty_radius': marker.casualty_radius
+            if marker.type.name == 'zombie' or marker.type.name == 'respawn' else None,
+            'url': marker.url_image,
+            'is_public': marker.is_public
+        })
+
+    for marker in zombies:
+        data.append({
+            'id': marker.id,
+            'name': marker.name,
+            'longitude': marker.longitude,
+            'latitude': marker.latitude,
+            'type': marker.type.name,
+            'casualty_radius': marker.casualty_radius
+            if marker.type.name == 'zombie' or marker.type.name == 'respawn' else None,
+            'url': marker.url_image,
+            'is_public': marker.is_public
+        })
+
+    for marker in flamethrowers:
+        data.append({
+            'id': marker.id,
+            'name': marker.name,
+            'longitude': marker.longitude,
+            'latitude': marker.latitude,
+            'type': marker.type.name,
+            'casualty_radius': marker.casualty_radius
+            if marker.type.name == 'zombie' or marker.type.name == 'respawn' else None,
+            'url': marker.url_image,
+            'is_public': marker.is_public
+        })
+
+    for marker in jackets:
+        data.append({
+            'id': marker.id,
+            'name': marker.name,
+            'longitude': marker.longitude,
+            'latitude': marker.latitude,
+            'type': marker.type.name,
+            'casualty_radius': marker.casualty_radius
+            if marker.type.name == 'zombie' or marker.type.name == 'respawn' else None,
+            'url': marker.url_image,
+            'is_public': marker.is_public
+        })
 
     return JsonResponse({
         'success': 1,
@@ -91,9 +155,9 @@ def take_marker(request):
     if not key_marker:
         return create_base_json_response(0, 'marker key is invalid')
 
-    marker = Marker.objects.filter(key=key_marker) \
-        .filter(Q(team__uid=team.uid) | Q(is_public=True)) \
-        .filter(Q(type__name='flamethrower') | Q(type__name='jacket')).first()
+    marker = Marker.objects.filter(team=team) \
+        .filter(Q(type__name='flamethrower') | Q(type__name='jacket')) \
+        .filter(key=key_marker).first()
 
     if marker and marker.team_taken:
         return create_base_json_response(0, 'marker already taken')
@@ -181,7 +245,7 @@ def set_my_position(request):
             if team.count_jacket > 0:
                 team.count_jacket -= 1
                 team.time_contact_marker = datetime.now()
-            elif (time.time() - team.time_contact_marker.timestamp()) > 60:
+            elif (time.time() - team.time_contact_marker.timestamp()) > 30:
                 team.time_contact_marker = datetime.now()
                 team.standard_of_living -= 1
 
@@ -193,10 +257,13 @@ def set_my_position(request):
 
     team.save()
 
+    count_kills = Marker.objects.filter(team_taken=team, type__name='zombie').count()
+
     return JsonResponse({
         'success': 1,
         'message': 'position is set',
         'data': {
+            'count_kills': count_kills,
             'count_lives': team.standard_of_living,
             'count_flamethrower': team.count_flamethrower,
             'count_jacket': team.count_jacket

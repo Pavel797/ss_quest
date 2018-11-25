@@ -4,7 +4,6 @@ from django.db import models
 class Team(models.Model):
     name = models.CharField(max_length=512)
     uid = models.CharField(max_length=120)
-    count_fail_marker_key = models.IntegerField(default=0)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     url_image = models.CharField(max_length=1024)
