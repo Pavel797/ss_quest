@@ -111,7 +111,7 @@
 
                             nameTeam.innerHTML = team.name;
                             countMarker.innerHTML = team.taken_markers_count;
-                            countFail.innerHTML = team.count_fail_marker_key;
+                            countFail.innerHTML = team.count_take_respawn;
                             standardOfLiving.innerHTML = team.standard_of_living;
 
                             myMap.geoObjects.add(new ymaps.Placemark([team.latitude, team.longitude], {
@@ -156,8 +156,8 @@
     <table border="1" width="100%" cellpadding="5" id="turnerTable">
         <tr>
             <th>Название команды</th>
-            <th>Кол-во собранных меток</th>
-            <th>Кол-во штрафных очков</th>
+            <th>Кол-во побеждённых снеговиков</th>
+            <th>Кол-во респаунов</th>
             <th>Жизни</th>
         </tr>
 
@@ -165,7 +165,7 @@
             <tr>
                 <td>{{ team.name }}</td>
                 <td>{{ team.taken_markers.count }}</td>
-                <td>{{ team.count_fail_marker_key }}</td>
+                <td>{{ team.count_take_respawn }}</td>
                 <td>{{ team.standard_of_living }}</td>
             </tr>
         {% endfor %}

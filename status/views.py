@@ -25,7 +25,7 @@ def get_status_json(request):
             'url_image': team.url_image,
             'longitude': team.longitude,
             'taken_markers_count': team.taken_markers.count(),
-            'count_fail_marker_key': team.count_fail_marker_key,
+            'count_take_respawn': team.count_take_respawn,
             'standard_of_living': team.standard_of_living
         } for team in teams]
     })
