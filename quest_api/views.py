@@ -105,10 +105,10 @@ def get_markers(request):
         zombies = Marker.objects.filter(team_taken=None, type__name='zombie') \
                       .order_by('-priority')[:MAX_COUNT_VISIBLE_ZOMBIE]
 
-        flamethrowers = Marker.objects.filter(Q(team=team, team_taken__isnull=True, type__name='flamethrower')) \
+        flamethrowers = Marker.objects.filter(team=team, team_taken__isnull=True, type__name='flamethrower') \
                             .order_by('-priority')[:MAX_COUNT_VISIBLE_FLAMETHROWER]
 
-        jackets = Marker.objects.filter(Q(team=team, team_taken__isnull=True, type__name='jacket')) \
+        jackets = Marker.objects.filter(team=team, team_taken__isnull=True, type__name='jacket') \
                       .order_by('-priority')[:MAX_COUNT_VISIBLE_JACKET]
 
     if len(flamethrowers) < MAX_COUNT_VISIBLE_FLAMETHROWER:
@@ -193,8 +193,11 @@ def take_marker(request):
     if not key_marker:
         return create_base_json_response(0, 'marker key is invalid')
 
-    flamethrowers = Marker.objects.filter(team=team).filter(type__name='flamethrower').order_by('-priority')[:3]
-    jackets = Marker.objects.filter(team=team).filter(type__name='jacket').order_by('-priority')[:3]
+    flamethrowers = Marker.objects.filter(team=team, team_taken__isnull=True, type__name='flamethrower') \
+                        .order_by('-priority')[:MAX_COUNT_VISIBLE_FLAMETHROWER]
+
+    jackets = Marker.objects.filter(team=team, team_taken__isnull=True, type__name='jacket') \
+                  .order_by('-priority')[:MAX_COUNT_VISIBLE_JACKET]
 
     marker = None
     for m in flamethrowers:
@@ -208,6 +211,7 @@ def take_marker(request):
             break
 
     if marker and marker.team_taken:
+        team.standard_of_living -= 1
         return create_base_json_response(0, 'marker already taken')
 
     if not marker:
