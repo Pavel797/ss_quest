@@ -188,7 +188,7 @@ def take_marker(request):
 
         if team.standard_of_living <= 0:
             team.count_flamethrower = 0
-            team.count_take_respawn = 0
+            team.count_jacket = 0
 
         team.save()
         return create_base_json_response(0, 'marker not found')
