@@ -155,9 +155,14 @@ def take_marker(request):
     if not key_marker:
         return create_base_json_response(0, 'marker key is invalid')
 
-    marker = Marker.objects.filter(team=team) \
-        .filter(Q(type__name='flamethrower') | Q(type__name='jacket')) \
-        .filter(key=key_marker).first()
+    markers = Marker.objects.filter(team=team) \
+                  .filter(Q(type__name='flamethrower') | Q(type__name='jacket'))[:3]
+
+    marker = None
+    for m in markers:
+        if m.key == key_marker:
+            marker = m
+            break
 
     if marker and marker.team_taken:
         return create_base_json_response(0, 'marker already taken')
@@ -237,7 +242,7 @@ def set_my_position(request):
             continue
 
         distance = haversine(team.latitude, team.longitude, marker.latitude, marker.longitude)
-        if marker.type.name == 'respawn' and distance <= marker.casualty_radius:
+        if marker.type.name == 'respawn' and distance <= marker.casualty_radius and team.standard_of_living < 3:
             team.standard_of_living = 3
             team.count_take_respawn += 1
             break
@@ -245,9 +250,12 @@ def set_my_position(request):
             if team.count_jacket > 0:
                 team.count_jacket -= 1
                 team.time_contact_marker = datetime.now()
-            elif (time.time() - team.time_contact_marker.timestamp()) > 30:
+            elif (time.time() - team.time_contact_marker.timestamp()) > 15:
                 team.time_contact_marker = datetime.now()
                 team.standard_of_living -= 1
+
+            if team.standard_of_living <= 0:
+                team.count_flamethrower = 0
 
             if team.count_flamethrower > 0:
                 team.count_flamethrower -= 1

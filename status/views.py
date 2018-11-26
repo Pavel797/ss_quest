@@ -14,7 +14,7 @@ def index(request):
 
 
 def get_status_json(request):
-    markers = Marker.objects.all().values()
+    markers = Marker.objects.exclude(type__name='zombie', team_taken__isnull=False).values()
     teams = Team.objects.all()
 
     return JsonResponse({
