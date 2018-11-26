@@ -14,6 +14,12 @@ docker-compose -f docker-compose.staging.yml up -d
 
 """
 
+MAX_COUNT_VISIBLE_ZOMBIE = 10
+MAX_COUNT_VISIBLE_FLAMETHROWER = 3
+MAX_COUNT_VISIBLE_JACKET = 3
+TIME_INVULNERABILITY = 15  # sec
+MAX_COUNT_LIVES = 3
+
 
 def isfloat(value):
     try:
@@ -44,6 +50,32 @@ def create_base_json_response(result_code, message, data=None):
     })
 
 
+def rewrite_flamethrowers(team, count):
+    flamethrowers = Marker.objects.filter(team=team, team_taken__isnull=False, type__name='flamethrower') \
+                        .order_by('priority')[:count]
+
+    if len(flamethrowers) < count:
+        print("ERROR")
+        return
+
+    for flamethrower in flamethrowers:
+        flamethrower.team_taken = None
+        flamethrower.save()
+
+
+def rewrite_jackets(team, count):
+    jackets = Marker.objects.filter(team=team, team_taken__isnull=False, type__name='jacket') \
+                        .order_by('priority')[:count]
+
+    if len(jackets) < count:
+        print("ERROR")
+        return
+
+    for jacket in jackets:
+        jacket.team_taken = None
+        jacket.save()
+
+
 def drop_markers(request):
     markers = Marker.objects.all()
 
@@ -71,13 +103,19 @@ def get_markers(request):
 
     if team.standard_of_living > 0:
         zombies = Marker.objects.filter(team_taken=None, type__name='zombie') \
-                      .order_by('-priority')[:10]
+                      .order_by('-priority')[:MAX_COUNT_VISIBLE_ZOMBIE]
 
         flamethrowers = Marker.objects.filter(Q(team=team, team_taken=None, type__name='flamethrower')) \
-                            .order_by('-priority')[:3]
+                            .order_by('-priority')[:MAX_COUNT_VISIBLE_FLAMETHROWER]
 
         jackets = Marker.objects.filter(Q(team=team, team_taken=None, type__name='jacket')) \
-                      .order_by('-priority')[:3]
+                      .order_by('-priority')[:MAX_COUNT_VISIBLE_JACKET]
+
+    if len(flamethrowers) < MAX_COUNT_VISIBLE_FLAMETHROWER:
+        rewrite_flamethrowers(team, MAX_COUNT_VISIBLE_FLAMETHROWER - len(flamethrowers))
+
+    if len(jackets) < MAX_COUNT_VISIBLE_JACKET:
+        rewrite_jackets(team, MAX_COUNT_VISIBLE_JACKET - len(jackets))
 
     data = []
 
@@ -252,15 +290,15 @@ def set_my_position(request):
             continue
 
         distance = haversine(team.latitude, team.longitude, marker.latitude, marker.longitude)
-        if marker.type.name == 'respawn' and distance <= marker.casualty_radius and team.standard_of_living < 3:
-            team.standard_of_living = 3
+        if marker.type.name == 'respawn' and distance <= marker.casualty_radius and team.standard_of_living < MAX_COUNT_LIVES:
+            team.standard_of_living = MAX_COUNT_LIVES
             team.count_take_respawn += 1
             break
         elif marker.type.name == 'zombie' and team.standard_of_living > 0 and distance <= marker.casualty_radius:
             if team.count_jacket > 0:
                 team.count_jacket -= 1
                 team.time_contact_marker = datetime.now()
-            elif (time.time() - team.time_contact_marker.timestamp()) > 15:
+            elif (time.time() - team.time_contact_marker.timestamp()) > TIME_INVULNERABILITY:
                 team.time_contact_marker = datetime.now()
                 team.standard_of_living -= 1
 
