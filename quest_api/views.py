@@ -52,7 +52,7 @@ def create_base_json_response(result_code, message, data=None):
 
 def rewrite_flamethrowers(team, count):
     flamethrowers = Marker.objects.filter(team=team, team_taken__isnull=False, type__name='flamethrower') \
-                        .order_by('time_take')[:count]
+                        .order_by('-time_take')[:count]
 
     if len(flamethrowers) < count:
         print("ERROR")
