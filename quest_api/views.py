@@ -185,6 +185,11 @@ def take_marker(request):
         result = 1
     else:
         team.standard_of_living -= 1
+
+        if team.standard_of_living <= 0:
+            team.count_flamethrower = 0
+            team.count_take_respawn = 0
+
         team.save()
         return create_base_json_response(0, 'marker not found')
 
@@ -261,6 +266,7 @@ def set_my_position(request):
 
             if team.standard_of_living <= 0:
                 team.count_flamethrower = 0
+                team.count_take_respawn = 0
 
             if team.count_flamethrower > 0:
                 team.count_flamethrower -= 1
