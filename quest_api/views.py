@@ -105,10 +105,10 @@ def get_markers(request):
         zombies = Marker.objects.filter(team_taken=None, type__name='zombie') \
                       .order_by('-priority')[:MAX_COUNT_VISIBLE_ZOMBIE]
 
-        flamethrowers = Marker.objects.filter(Q(team=team, team_taken=None, type__name='flamethrower')) \
+        flamethrowers = Marker.objects.filter(Q(team=team, team_taken__isnull=True, type__name='flamethrower')) \
                             .order_by('-priority')[:MAX_COUNT_VISIBLE_FLAMETHROWER]
 
-        jackets = Marker.objects.filter(Q(team=team, team_taken=None, type__name='jacket')) \
+        jackets = Marker.objects.filter(Q(team=team, team_taken__isnull=True, type__name='jacket')) \
                       .order_by('-priority')[:MAX_COUNT_VISIBLE_JACKET]
 
     if len(flamethrowers) < MAX_COUNT_VISIBLE_FLAMETHROWER:
