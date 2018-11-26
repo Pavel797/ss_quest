@@ -52,7 +52,7 @@ def create_base_json_response(result_code, message, data=None):
 
 def rewrite_flamethrowers(team, count):
     flamethrowers = Marker.objects.filter(team=team, team_taken__isnull=False, type__name='flamethrower') \
-                        .order_by('priority')[:count]
+                        .order_by('time_take')[:count]
 
     if len(flamethrowers) < count:
         print("ERROR")
@@ -65,7 +65,7 @@ def rewrite_flamethrowers(team, count):
 
 def rewrite_jackets(team, count):
     jackets = Marker.objects.filter(team=team, team_taken__isnull=False, type__name='jacket') \
-                        .order_by('priority')[:count]
+                  .order_by('priority')[:count]
 
     if len(jackets) < count:
         print("ERROR")
@@ -210,18 +210,7 @@ def take_marker(request):
     if marker and marker.team_taken:
         return create_base_json_response(0, 'marker already taken')
 
-    if marker:
-        marker.team_taken = team
-
-        if marker.type.name == 'flamethrower':
-            team.count_flamethrower += 2
-        elif marker.type.name == 'jacket':
-            team.count_jacket += 1
-
-        marker.save()
-        team.save()
-        result = 1
-    else:
+    if not marker:
         team.standard_of_living -= 1
 
         if team.standard_of_living <= 0:
@@ -231,11 +220,21 @@ def take_marker(request):
         team.save()
         return create_base_json_response(0, 'marker not found')
 
+    marker.team_taken = team
+    marker.time_take = datetime.now()
+    if marker.type.name == 'flamethrower':
+        team.count_flamethrower += 2
+    elif marker.type.name == 'jacket':
+        team.count_jacket += 1
+
+    marker.save()
+    team.save()
+
     return JsonResponse({
         'success': 1,
         'message': 'marker taken',
         'data': {
-            'result': result
+            'result': 1
         }
 
     })

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class Team(models.Model):
@@ -11,7 +12,7 @@ class Team(models.Model):
     count_take_respawn = models.IntegerField(default=0)
     count_jacket = models.IntegerField(default=0)
     count_flamethrower = models.IntegerField(default=0)
-    time_contact_marker = models.DateTimeField(default=0)
+    time_contact_marker = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name
@@ -36,6 +37,7 @@ class Marker(models.Model):
     key = models.CharField(max_length=120)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='markers', blank=True, null=True)
     team_taken = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='taken_markers', blank=True, null=True)
+    time_take = models.DateTimeField(default=timezone.now, blank=True, null=True)
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.type)
