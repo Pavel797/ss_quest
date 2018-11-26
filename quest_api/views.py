@@ -155,11 +155,16 @@ def take_marker(request):
     if not key_marker:
         return create_base_json_response(0, 'marker key is invalid')
 
-    markers = Marker.objects.filter(team=team) \
-                  .filter(Q(type__name='flamethrower') | Q(type__name='jacket'))[:3]
+    flamethrowers = Marker.objects.filter(team=team).filter(type__name='flamethrower')[:3]
+    jackets = Marker.objects.filter(team=team).filter(type__name='jacket')[:3]
 
     marker = None
-    for m in markers:
+    for m in flamethrowers:
+        if m.key == key_marker:
+            marker = m
+            break
+
+    for m in jackets:
         if m.key == key_marker:
             marker = m
             break
