@@ -155,8 +155,8 @@ def take_marker(request):
     if not key_marker:
         return create_base_json_response(0, 'marker key is invalid')
 
-    flamethrowers = Marker.objects.filter(team=team).filter(type__name='flamethrower')[:3]
-    jackets = Marker.objects.filter(team=team).filter(type__name='jacket')[:3]
+    flamethrowers = Marker.objects.filter(team=team).filter(type__name='flamethrower').order_by('-priority')[:3]
+    jackets = Marker.objects.filter(team=team).filter(type__name='jacket').order_by('-priority')[:3]
 
     marker = None
     for m in flamethrowers:
