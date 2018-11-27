@@ -65,7 +65,7 @@ def rewrite_flamethrowers(team, count):
 
 def rewrite_jackets(team, count):
     jackets = Marker.objects.filter(team=team, team_taken__isnull=False, type__name='jacket') \
-                  .order_by('priority')[:count]
+                  .order_by('time_take')[:count]
 
     if len(jackets) < count:
         print("ERROR")
