@@ -15,7 +15,9 @@ def index(request):
 
 def get_status_json(request):
     markers = Marker.objects.exclude(type__name='zombie', team_taken__isnull=False).values()
-    teams = Team.objects.all()
+    teams = sorted(Team.objects.all(), key = lambda team: (-team.taken_markers.count(),
+                                                          (team.count_take_respawn * 10) +
+                                                           team.time_kill_zombie.timestamp()))
 
     return JsonResponse({
         'markers': list(markers),
@@ -24,8 +26,9 @@ def get_status_json(request):
             'latitude': team.latitude,
             'url_image': team.url_image,
             'longitude': team.longitude,
-            'taken_markers_count': team.taken_markers.count(),
-            'count_take_respawn': team.count_take_respawn,
+            'taken_markers_count': Marker.objects.filter(team_taken=team, type__name='zombie').count(),
+            'time_kill': team.time_kill_zombie.timestamp(),
+            'penalty_time': team.count_take_respawn * 10,
             'standard_of_living': team.standard_of_living
         } for team in teams]
     })

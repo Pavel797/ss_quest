@@ -23,34 +23,6 @@
                     controls: []
                 });
 
-
-                {% for team in teams %}
-                    myMap.geoObjects.add(new ymaps.Placemark([{{ team.latitude }}, {{ team.longitude }}], {
-                        hintContent: '{{ team.name }}',
-                        // Содержимое балуна
-                    }, {
-                        iconLayout: 'default#image',
-                        iconImageHref: '{{ team.url_image }}',
-                        iconImageSize: [25, 25],
-                        iconImageOffset: [-5, -38]
-                    }));
-
-                {% endfor %}
-
-
-                {% for marker in markers  %}
-                    myMap.geoObjects.add(new ymaps.Placemark([{{ marker.latitude }}, {{ marker.longitude }}], {
-                        hintContent: '{{ marker.name }}', // Содержимое всплывающей подсказки
-                        balloonContent: 'Взята командой: {{  marker.team_taken.name }}'
-                        // Содержимое балуна
-                    }, {
-                        iconLayout: 'default#image',
-                        iconImageHref: '{{ marker.url_image }}',
-                        iconImageSize: [60, 60],
-                        iconImageOffset: [-5, -38]
-                    }));
-                {% endfor %}
-
             });
 
             function updateData() {
@@ -88,11 +60,15 @@
                         tr.appendChild(th);
 
                         th = document.createElement('th');
-                        th.innerHTML = "Кол-во собранных меток";
+                        th.innerHTML = "Кол-во убитых снеговиков";
                         tr.appendChild(th);
 
                         th = document.createElement('th');
-                        th.innerHTML = "Кол-во штрафных очков";
+                        th.innerHTML = "Время последнего убитого снеговика";
+                        tr.appendChild(th);
+
+                        th = document.createElement('th');
+                        th.innerHTML = "Штрафное время";
                         tr.appendChild(th);
 
                         th = document.createElement('th');
@@ -105,13 +81,15 @@
                         data.teams.forEach(function (team, i, arr) {
                             var newRow = turnirTable.insertRow(i + 1);
                             var nameTeam = newRow.insertCell(0);
-                            var countMarker = newRow.insertCell(1);
-                            var countFail = newRow.insertCell(2);
-                            var standardOfLiving = newRow.insertCell(3);
+                            var countKills = newRow.insertCell(1);
+                            var time_kill = newRow.insertCell(2);
+                            var penalty_time = newRow.insertCell(3);
+                            var standardOfLiving = newRow.insertCell(4);
 
                             nameTeam.innerHTML = team.name;
-                            countMarker.innerHTML = team.taken_markers_count;
-                            countFail.innerHTML = team.count_take_respawn;
+                            countKills.innerHTML = team.taken_markers_count;
+                            time_kill.innerHTML = team.time_kill;
+                            penalty_time.innerHTML = team.penalty_time;
                             standardOfLiving.innerHTML = team.standard_of_living;
 
                             myMap.geoObjects.add(new ymaps.Placemark([team.latitude, team.longitude], {
@@ -153,23 +131,7 @@
 
     <div id="map" style="width: 100%; height: 700px"></div>
 
-    <table border="1" width="100%" cellpadding="5" id="turnerTable">
-        <tr>
-            <th>Название команды</th>
-            <th>Кол-во побеждённых снеговиков</th>
-            <th>Кол-во респаунов</th>
-            <th>Жизни</th>
-        </tr>
-
-        {% for team in teams %}
-            <tr>
-                <td>{{ team.name }}</td>
-                <td>{{ team.taken_markers.count }}</td>
-                <td>{{ team.count_take_respawn }}</td>
-                <td>{{ team.standard_of_living }}</td>
-            </tr>
-        {% endfor %}
-    </table>
+    <table border="1" width="100%" cellpadding="5" id="turnerTable"></table>
 
 </div>
 </body>

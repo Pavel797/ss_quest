@@ -13,6 +13,7 @@ class Team(models.Model):
     count_jacket = models.IntegerField(default=0)
     count_flamethrower = models.IntegerField(default=0)
     time_contact_marker = models.DateTimeField(default=timezone.now)
+    time_kill_zombie = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name
@@ -30,7 +31,6 @@ class Marker(models.Model):
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     url_image = models.CharField(max_length=1024)
-    is_public = models.BooleanField(default=False)
     priority = models.IntegerField(default=0)
     type = models.ForeignKey(MarkerType, on_delete=models.CASCADE, related_name='markers')
     casualty_radius = models.DecimalField(max_digits=9, decimal_places=6)

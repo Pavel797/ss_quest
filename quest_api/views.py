@@ -129,7 +129,6 @@ def get_markers(request):
             'casualty_radius': marker.casualty_radius
             if marker.type.name == 'zombie' or marker.type.name == 'respawn' else None,
             'url': marker.url_image,
-            'is_public': marker.is_public
         })
 
     for marker in zombies:
@@ -142,7 +141,6 @@ def get_markers(request):
             'casualty_radius': marker.casualty_radius
             if marker.type.name == 'zombie' or marker.type.name == 'respawn' else None,
             'url': marker.url_image,
-            'is_public': marker.is_public
         })
 
     for marker in flamethrowers:
@@ -154,8 +152,7 @@ def get_markers(request):
             'type': marker.type.name,
             'casualty_radius': marker.casualty_radius
             if marker.type.name == 'zombie' or marker.type.name == 'respawn' else None,
-            'url': marker.url_image,
-            'is_public': marker.is_public
+            'url': marker.url_image
         })
 
     for marker in jackets:
@@ -167,8 +164,7 @@ def get_markers(request):
             'type': marker.type.name,
             'casualty_radius': marker.casualty_radius
             if marker.type.name == 'zombie' or marker.type.name == 'respawn' else None,
-            'url': marker.url_image,
-            'is_public': marker.is_public
+            'url': marker.url_image
         })
 
     return JsonResponse({
@@ -307,10 +303,11 @@ def set_my_position(request):
 
             if team.standard_of_living <= 0:
                 team.count_flamethrower = 0
-                team.count_take_respawn = 0
+                team.count_jacket = 0
 
             if team.count_flamethrower > 0:
                 team.count_flamethrower -= 1
+                team.time_kill_zombie = datetime.now()
                 marker.team_taken = team
                 marker.save()
             break
