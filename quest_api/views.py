@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from datetime import datetime
 from .models import *
 from math import *
+import random
 import time
 
 """
@@ -266,6 +267,9 @@ def get_hints(request):
 
 
 def set_my_position(request):
+    create_things(JACKET, 'http://img.ipev.ru/2018/11/21/imgpsh_fullsize-1.png')
+    create_things(FLAMETHROWER, 'http://img.ipev.ru/2018/11/21/imgpsh_fullsize.png')
+
     uid_team = request.GET.get('uid_team')
     team = Team.objects.filter(uid=uid_team).first()
 
@@ -326,3 +330,65 @@ def set_my_position(request):
             'count_jacket': team.count_jacket
         }
     })
+
+
+def create_things(things, url):
+    for tiem in Team.objects.all():
+        rand = random.sample(things, 8)
+        for ind in range(0, len(rand)):
+            Marker(name='{}-{}'.format(rand[ind][0], tiem.name), latitude=float(rand[ind][2]), longitude=float(rand[ind][3]),
+                   type=MarkerType.objects.filter(name=rand[ind][1]).first(), url_image=url,
+                   priority=ind, casualty_radius=-1, key=rand[ind][4], team=tiem).save()
+
+
+def create_zombies():
+    for z in ZOMBIES:
+        Marker(name=z[0], latitude=float(z[2]), longitude=float(z[3]),
+               type=MarkerType.objects.filter(name=z[1]).first(),
+               url_image='http://img.ipev.ru/2018/11/21/imgpsh_fullsize-2.png',
+               priority=-1, casualty_radius=20, key='Null').save()
+
+
+ZOMBIES = [
+    ['Z-1', 'zombie', '54.33282', '48.38576'],
+    ['Z-2', 'zombie', '54.33304', '48.38303'],
+    ['Z-3', 'zombie', '54.33325', '48.38648'],
+    ['Z-4', 'zombie', '54.33354', '48.38601'],
+    ['Z-5', 'zombie', '54.33375', '48.38387'],
+    ['Z-6', 'zombie', '54.33389', '48.38429'],
+    ['Z-7', 'zombie', '54.33504', '48.38449'],
+    ['Z-8', 'zombie', '54.33528', '48.38414'],
+    ['Z-9', 'zombie', '54.33245', '48.38695'],
+    ['Z-10', 'zombie', '54.33312', '48.38644'],
+    ['Z-11', 'zombie', '54.33196', '48.3849'],
+    ['Z-12', 'zombie', '54.33191', '48.3871'],
+    ['Z-13', 'zombie', '54.33197', '48.38788'],
+    ['Z-14', 'zombie', '54.33267', '48.38725'],
+    ['Z-15', 'zombie', '54.33257', '48.38539']
+]
+
+FLAMETHROWER = [
+    ['F-1', 'flamethrower', '54.33361', '48.38572', '0e9ZbTo3Xr7diqzQOdIdiuYq2'],
+    ['F-2', 'flamethrower', '54.3337', '48.38389', 'G2h4dqNKHR0JELAsmUkueih8m'],
+    ['F-3', 'flamethrower', '54.33374', '48.38444', 'hMt0HStBjypSdUmX8zfkoK7ii'],
+    ['F-4', 'flamethrower', '54.33266', '48.3884', 'WovKuRDdncnrhiaourXu9Xysl'],
+    ['F-5', 'flamethrower', '54.33348', '48.38697', 'Z9HsqcWxRRhBzowtQ2TZBaJkP'],
+    ['F-6', 'flamethrower', '54.33212', '48.38782', 'VclwEyzk4EIlG9KmHHgye6gik'],
+    ['F-7', 'flamethrower', '54.33159', '48.38516', 'd5732vbTS4P0M8QROFWb2oaF1'],
+    ['F-8', 'flamethrower', '54.33271', '48.38452', 'QiRvDbow0KBOcvz0AvoWQV8Mv'],
+    ['F-9', 'flamethrower', '54.33392', '48.38633', 'rOyrt1C0Zyeo3Z4S36uPmMQHp'],
+    ['F-10', 'flamethrower', '54.3314', '48.38682', 'ACsW8J1En2Ke7CWpFYxmvTI2j']
+]
+
+JACKET = [
+    ['J-1', 'jacket', '54.33464', '48.38364', 'JsHKPlGAYRyBkfQuRiSaDmsbB'],
+    ['J-2', 'jacket', '54.33248', '48.3862', 'ruxNE1Z63qAAjCs4X98n0YNas'],
+    ['J-3', 'jacket', '54.33258', '48.38734', 'F3ojIbHJD73MRFHY5uGTxJ2R5'],
+    ['J-4', 'jacket', '54.33189', '48.38657', 'hV4bhXDXrgGiv44hnrxBfOr8j'],
+    ['J-5', 'jacket', '54.33474', '48.38467', 'gdA9pRyFpojYc7nH449o8HOfW'],
+    ['J-6', 'jacket', '54.33301', '48.3842', 'yLFfe2o4HCakRpoRBGUOFxnpE'],
+    ['J-7', 'jacket', '54.3342', '48.38556', 'qhPT9Od4tVSrGiKOkbFoOorm4'],
+    ['J-8', 'jacket', '54.33278', '48.38809', 'CUmbdCYjV5JlWBrv8gWK432WM'],
+    ['J-9', 'jacket', '54.3329', '48.38601', 'sm1Ay8h0R7u7pRNSqtwxgTfrt'],
+    ['J-10', 'jacket', '54.33365', '48.38645', 'pKwQBMieRYC2YQmnQLEPBhejm']
+]
