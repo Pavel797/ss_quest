@@ -330,9 +330,9 @@ def set_my_position(request):
 
 
 def create_prod_base(request):
-    create_zombies()
-    create_things(JACKET, 'http://img.ipev.ru/2018/11/21/imgpsh_fullsize-1.png')
-    create_things(FLAMETHROWER, 'http://img.ipev.ru/2018/11/21/imgpsh_fullsize.png')
+    create_zombies(ZOMBIES)
+    create_things(JACKET, 8, 'http://img.ipev.ru/2018/11/21/imgpsh_fullsize-1.png')
+    create_things(FLAMETHROWER, 8, 'http://img.ipev.ru/2018/11/21/imgpsh_fullsize.png')
 
     return JsonResponse({
         'success': 1,
@@ -340,9 +340,20 @@ def create_prod_base(request):
     })
 
 
-def create_things(things, url):
+def create_test_base(request):
+    create_zombies(ZOMBIES_TEST)
+    create_things(JACKET_TEST, 4, 'http://img.ipev.ru/2018/11/21/imgpsh_fullsize-1.png')
+    create_things(FLAMETHROWER_TEST, 4, 'http://img.ipev.ru/2018/11/21/imgpsh_fullsize.png')
+
+    return JsonResponse({
+        'success': 1,
+        'message': 'Ok'
+    })
+
+
+def create_things(things, count, url):
     for tiem in Team.objects.all():
-        rand = random.sample(things, 8)
+        rand = random.sample(things, count)
         for ind in range(0, len(rand)):
             Marker(name='{}-{}'.format(rand[ind][0], tiem.name), latitude=float(rand[ind][2]),
                    longitude=float(rand[ind][3]),
@@ -350,13 +361,21 @@ def create_things(things, url):
                    priority=ind, casualty_radius=-1, key=rand[ind][4], team=tiem).save()
 
 
-def create_zombies():
-    for z in ZOMBIES:
+def create_zombies(zombies):
+    for z in zombies:
         Marker(name=z[0], latitude=float(z[2]), longitude=float(z[3]),
                type=MarkerType.objects.filter(name=z[1]).first(),
                url_image='http://img.ipev.ru/2018/11/21/imgpsh_fullsize-2.png',
                priority=-1, casualty_radius=20, key='Null').save()
 
+
+ZOMBIES_TEST = [
+    ['Z-1-test', 'zombie', '54.334958', '48.383679'],
+    ['Z-2-test', 'zombie', '54.334522', '48.383368'],
+    ['Z-3-test', 'zombie', '54.334152', '48.383143'],
+    ['Z-4-test', 'zombie', '54.333795', '48.382885'],
+    ['Z-5-test', 'zombie', '54.333406', '48.382638'],
+]
 
 ZOMBIES = [
     ['Z-1', 'zombie', '54.33282', '48.38576'],
@@ -411,6 +430,13 @@ ZOMBIES = [
     ['Z-50', 'zombie', '54.33572', '48.38225']
 ]
 
+FLAMETHROWER_TEST = [
+    ['F-1', 'flamethrower', '54.334616', '48.384001', '0e9ZbTo3Xr7diqzQOdIdiuYq2'],
+    ['F-2', 'flamethrower', '54.334387', '48.384210', 'G2h4dqNKHR0JELAsmUkueih8m'],
+    ['F-3', 'flamethrower', '54.334190', '48.384398', 'hMt0HStBjypSdUmX8zfkoK7ii'],
+    ['F-4', 'flamethrower', '54.333999', '48.384586', 'WovKuRDdncnrhiaourXu9Xysl'],
+]
+
 FLAMETHROWER = [
     ['F-1', 'flamethrower', '54.33361', '48.38572', '0e9ZbTo3Xr7diqzQOdIdiuYq2'],
     ['F-2', 'flamethrower', '54.3337', '48.38389', 'G2h4dqNKHR0JELAsmUkueih8m'],
@@ -422,6 +448,13 @@ FLAMETHROWER = [
     ['F-8', 'flamethrower', '54.33271', '48.38452', 'QiRvDbow0KBOcvz0AvoWQV8Mv'],
     ['F-9', 'flamethrower', '54.33392', '48.38633', 'rOyrt1C0Zyeo3Z4S36uPmMQHp'],
     ['F-10', 'flamethrower', '54.3314', '48.38682', 'ACsW8J1En2Ke7CWpFYxmvTI2j']
+]
+
+JACKET_TEST = [
+    ['J-1', 'jacket', '54.334014', '48.384869', 'JsHKPlGAYRyBkfQuRiSaDmsbB'],
+    ['J-2', 'jacket', '54.333819', '48.385064', 'ruxNE1Z63qAAjCs4X98n0YNas'],
+    ['J-3', 'jacket', '54.333666', '48.385212', 'F3ojIbHJD73MRFHY5uGTxJ2R5'],
+    ['J-4', 'jacket', '54.333443', '48.385301', 'hV4bhXDXrgGiv44hnrxBfOr8j']
 ]
 
 JACKET = [

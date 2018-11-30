@@ -9,4 +9,5 @@ urlpatterns = [
     #path('drop_markers/', views.drop_markers, name='drop_markers'),
     path('set_my_position/', views.set_my_position, name='set_my_position'),
     path('create_prod_base/', views.create_prod_base, name='create_prod_base'),
+    path('create_test_base/', views.create_test_base, name='create_test_base'),
 ]
