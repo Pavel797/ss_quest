@@ -267,7 +267,6 @@ def get_hints(request):
 
 
 def set_my_position(request):
-
     uid_team = request.GET.get('uid_team')
     team = Team.objects.filter(uid=uid_team).first()
 
@@ -345,7 +344,8 @@ def create_things(things, url):
     for tiem in Team.objects.all():
         rand = random.sample(things, 8)
         for ind in range(0, len(rand)):
-            Marker(name='{}-{}'.format(rand[ind][0], tiem.name), latitude=float(rand[ind][2]), longitude=float(rand[ind][3]),
+            Marker(name='{}-{}'.format(rand[ind][0], tiem.name), latitude=float(rand[ind][2]),
+                   longitude=float(rand[ind][3]),
                    type=MarkerType.objects.filter(name=rand[ind][1]).first(), url_image=url,
                    priority=ind, casualty_radius=-1, key=rand[ind][4], team=tiem).save()
 
@@ -373,7 +373,42 @@ ZOMBIES = [
     ['Z-12', 'zombie', '54.33191', '48.3871'],
     ['Z-13', 'zombie', '54.33197', '48.38788'],
     ['Z-14', 'zombie', '54.33267', '48.38725'],
-    ['Z-15', 'zombie', '54.33257', '48.38539']
+    ['Z-15', 'zombie', '54.33257', '48.38539'],
+    ['Z-16', 'zombie', '54.33235', '48.38832'],
+    ['Z-17', 'zombie', '54.33502', '48.38272'],
+    ['Z-18', 'zombie', '54.33479', '48.38534'],
+    ['Z-19', 'zombie', '54.33364', '48.38734'],
+    ['Z-20', 'zombie', '54.33304', '48.38392'],
+    ['Z-21', 'zombie', '54.33268', '48.38317'],
+    ['Z-22', 'zombie', '54.33345', '48.38351'],
+    ['Z-23', 'zombie', '54.33233', '48.3852'],
+    ['Z-24', 'zombie', '54.33242', '48.38495'],
+    ['Z-25', 'zombie', '54.33197', '48.38606'],
+    ['Z-26', 'zombie', '54.33121', '48.38682'],
+    ['Z-27', 'zombie', '54.33343', '48.3862'],
+    ['Z-28', 'zombie', '54.33273', '48.38638'],
+    ['Z-29', 'zombie', '54.33324', '48.38466'],
+    ['Z-30', 'zombie', '54.33395', '48.38529'],
+    ['Z-31', 'zombie', '54.33074', '48.38705'],
+    ['Z-32', 'zombie', '54.33709', '48.38248'],
+    ['Z-33', 'zombie', '54.3305', '48.38731'],
+    ['Z-34', 'zombie', '54.33346', '48.38645'],
+    ['Z-35', 'zombie', '54.33373', '48.38621'],
+    ['Z-36', 'zombie', '54.33384', '48.38565'],
+    ['Z-37', 'zombie', '54.33282', '48.38775'],
+    ['Z-38', 'zombie', '54.33336', '48.38252'],
+    ['Z-39', 'zombie', '54.33311', '48.38234'],
+    ['Z-40', 'zombie', '54.33428', '48.38574'],
+    ['Z-41', 'zombie', '54.3342', '48.38807'],
+    ['Z-42', 'zombie', '54.33324', '48.38718'],
+    ['Z-43', 'zombie', '54.33246', '48.38612'],
+    ['Z-44', 'zombie', '54.33312', '48.38567'],
+    ['Z-45', 'zombie', '54.33234', '48.38534'],
+    ['Z-46', 'zombie', '54.33384', '48.38689'],
+    ['Z-47', 'zombie', '54.33374', '48.38776'],
+    ['Z-48', 'zombie', '54.33591', '48.38354'],
+    ['Z-49', 'zombie', '54.33682', '48.38174'],
+    ['Z-50', 'zombie', '54.33572', '48.38225']
 ]
 
 FLAMETHROWER = [
