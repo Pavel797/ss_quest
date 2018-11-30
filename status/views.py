@@ -15,9 +15,9 @@ def index(request):
 
 def get_status_json(request):
     markers = Marker.objects.exclude(type__name='zombie', team_taken__isnull=False).values()
-    teams = sorted(Team.objects.all(), key = lambda team: (-team.taken_markers.count(),
-                                                          (team.count_take_respawn * 10) +
-                                                           team.time_kill_zombie.timestamp()))
+    teams = sorted(Team.objects.all(), key=lambda team: (-team.taken_markers.count(),
+                                                         ((team.count_take_respawn * 10) +
+                                                           team.time_kill_zombie.timestamp())))
 
     return JsonResponse({
         'markers': list(markers),

@@ -267,8 +267,6 @@ def get_hints(request):
 
 
 def set_my_position(request):
-    create_things(JACKET, 'http://img.ipev.ru/2018/11/21/imgpsh_fullsize-1.png')
-    create_things(FLAMETHROWER, 'http://img.ipev.ru/2018/11/21/imgpsh_fullsize.png')
 
     uid_team = request.GET.get('uid_team')
     team = Team.objects.filter(uid=uid_team).first()
@@ -329,6 +327,17 @@ def set_my_position(request):
             'count_flamethrower': team.count_flamethrower,
             'count_jacket': team.count_jacket
         }
+    })
+
+
+def create_prod_base(request):
+    create_zombies()
+    create_things(JACKET, 'http://img.ipev.ru/2018/11/21/imgpsh_fullsize-1.png')
+    create_things(FLAMETHROWER, 'http://img.ipev.ru/2018/11/21/imgpsh_fullsize.png')
+
+    return JsonResponse({
+        'success': 1,
+        'message': 'Ok'
     })
 
 

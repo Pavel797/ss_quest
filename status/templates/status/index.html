@@ -37,8 +37,7 @@
                             myMap.geoObjects.add(new ymaps.Placemark([marker.latitude, marker.longitude], {
                                 my_id: marker.id,
                                 hintContent: marker.name, // Содержимое всплывающей подсказки
-                                balloonContent: 'Взята командой: ' + marker.team_id
-                                // Содержимое балуна
+                                //balloonContent: 'Взята командой: ' + marker.team_id
                             }, {
                                 iconLayout: 'default#image',
                                 iconImageHref: marker.url_image,
@@ -88,7 +87,7 @@
 
                             nameTeam.innerHTML = team.name;
                             countKills.innerHTML = team.taken_markers_count;
-                            time_kill.innerHTML = team.time_kill - 1543480825;
+                            time_kill.innerHTML = team.time_kill - 1543569742;
                             penalty_time.innerHTML = team.penalty_time;
                             standardOfLiving.innerHTML = team.standard_of_living;
 
